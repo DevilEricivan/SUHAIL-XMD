@@ -1,0 +1,42 @@
+name: Deploy WASI Bot
+
+on:
+  push:
+    branches:
+      - main 
+   pull_resquest: 
+       branches:
+      - main 
+
+jobs:
+   deploy:
+    runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          node-version: [20,x]
+    steps:
+    
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{matrix,node-version}}
+
+    
+    - name: Install dependencies
+      run: npm install
+
+    
+    - name: Setup environment
+      run: |
+        echo "SESSION_PATH=./session/session.json" >> .env
+        echo "BOT_NAME=${{ secrets.BOT_NAME }}" >> .env
+        echo "OWNER_NUMBER=${{ secrets.OWNER_NUMBER }}" >> .env
+        echo "PREFIX=${{ secrets.PREFIX }}" >> .env
+
+    
+    - name: Start bot
+      run: node index.js
